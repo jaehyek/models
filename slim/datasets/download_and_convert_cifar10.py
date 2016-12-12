@@ -26,9 +26,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _pickle
 import os
 import sys
+if sys.version_info[0] == 3:
+  import _pickle
+else:
+  import cPickle
 import tarfile
 
 import numpy as np
@@ -73,7 +76,10 @@ def _add_to_tfrecord(filename, tfrecord_writer, offset=0):
     The new offset.
   """
   with tf.gfile.Open(filename, 'r') as f:
-    data = _pickle.load(f)
+    if sys.version_info[0] == 3:
+      data = _pickle.load(f)
+    else:
+      data = cPickle.load(f)
 
   images = data['data']
   num_images = images.shape[0]
