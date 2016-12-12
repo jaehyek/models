@@ -192,6 +192,7 @@ def run(dataset_dir):
   class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
   # Divide into train and test:
+  print("Now let's start converting the Koreans dataset!")
   random.seed(_RANDOM_SEED)
   random.shuffle(photo_filenames)
   training_filenames = photo_filenames[_NUM_VALIDATION:]
