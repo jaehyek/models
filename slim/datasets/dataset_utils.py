@@ -72,12 +72,19 @@ def download_and_uncompress_tarball(tarball_url, dataset_dir):
   """
   filename = tarball_url.split('/')[-1]
   filepath = os.path.join(dataset_dir, filename)
+  uncompress_path = os.path.join(dataset_dir, 'korean_photos')
+  if os.path.exists(uncompress_path):
+    print('Already downloaded and uncompressed.')
+    return
 
   def _progress(count, block_size, total_size):
     sys.stdout.write('\r>> Downloading %s %.1f%%' % (
         filename, float(count * block_size) / float(total_size) * 100.0))
     sys.stdout.flush()
-  filepath, _ = urllib.request.urlretrieve(tarball_url, filepath, _progress)
+  if os.path.exists(filepath):
+    print('Already downloaded.')
+  else:
+    filepath, _ = urllib.request.urlretrieve(tarball_url, filepath, _progress)
   print()
   statinfo = os.stat(filepath)
   print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
