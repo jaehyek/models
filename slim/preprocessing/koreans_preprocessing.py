@@ -219,10 +219,10 @@ def preprocess_for_train(image, height, width, bbox,
                      tf.expand_dims(distorted_image, 0))
 
     # Randomly distort the colors. There are 4 ways to do it.
-    distorted_image = apply_with_random_selector(
-      distorted_image,
-      lambda x, ordering: distort_color(x, ordering, fast_mode),
-      num_cases=4)
+    # distorted_image = apply_with_random_selector(
+    #   distorted_image,
+    #   lambda x, ordering: distort_color(x, ordering, fast_mode),
+    #   num_cases=4)
 
     tf.image_summary('final_distorted_image',
                      tf.expand_dims(distorted_image, 0))
