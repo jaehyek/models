@@ -74,11 +74,14 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
     'image/format': tf.FixedLenFeature((), tf.string, default_value='jpeg'),
     'image/class/label': tf.FixedLenFeature(
       [], tf.int64, default_value=-1),
+    'image/class/text': tf.FixedLenFeature(
+      [], dtype=tf.string, default_value=''),
   }
 
   items_to_handlers = {
     'image': slim.tfexample_decoder.Image(shape=[42, 42, 1], channels=1),
     'label': slim.tfexample_decoder.Tensor('image/class/label'),
+    'label_text': slim.tfexample_decoder.Tensor('image/class/text'),
   }
 
   decoder = slim.tfexample_decoder.TFExampleDecoder(

@@ -164,9 +164,10 @@ def _download_dataset(dataset_dir):
                                                filepath,
                                                _progress)
       print()
-      with tf.gfile.GFile(filepath) as f:
-        size = f.Size()
-      print('Successfully downloaded', filename, size, 'bytes.')
+      # with tf.gfile.GFile(filepath) as f:
+      #   size = f.Size()
+      # print('Successfully downloaded', filename, size, 'bytes.')
+      print('Successfully downloaded', filename, 'bytes.')
 
 
 def _clean_up_temporary_files(dataset_dir):
