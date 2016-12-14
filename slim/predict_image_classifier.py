@@ -149,11 +149,12 @@ def main(_):
     predictions = tf.argmax(logits, 1)
 
     # Define the metrics:
-    # names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
-    #   'Predictions': slim.metrics.streaming_accuracy(predictions, labels),
-    #   'Predictions@5': slim.metrics.streaming_recall_at_k(
-    #     logits, labels, 5),
-    # })
+    names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
+      'Predictions': predictions,
+      # 'Predictions': slim.metrics.streaming_accuracy(predictions, labels),
+      # 'Predictions@5': slim.metrics.streaming_recall_at_k(
+      #   logits, labels, 5),
+    })
 
     # Print the summaries to screen.
     # for name, value in names_to_values.iteritems():
@@ -161,10 +162,6 @@ def main(_):
     #   op = tf.scalar_summary(summary_name, value, collections=[])
     #   op = tf.Print(op, [value], summary_name)
     #   tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
-    summary_name = 'prediction'
-    op = tf.scalar_summary(summary_name, predictions, collections=[])
-    op = tf.Print(op, [predictions], summary_name)
-    tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
 
     # TODO(sguada) use num_epochs=1
     if FLAGS.max_num_batches:
