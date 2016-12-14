@@ -112,7 +112,7 @@ def main(_):
       shuffle=False,
       common_queue_capacity=2 * FLAGS.batch_size,
       common_queue_min=FLAGS.batch_size)
-    image = provider.get('image')
+    [image] = provider.get(['image'])
 
     #####################################
     # Select the preprocessing function #
@@ -127,7 +127,7 @@ def main(_):
     image = image_preprocessing_fn(image, eval_image_size, eval_image_size)
 
     images = tf.train.batch(
-      image,
+      [image],
       batch_size=FLAGS.batch_size,
       num_threads=FLAGS.num_preprocessing_threads,
       capacity=5 * FLAGS.batch_size)
