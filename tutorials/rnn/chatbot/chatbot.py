@@ -27,8 +27,8 @@ See the following papers for more information on neural translation models.
  * http://arxiv.org/abs/1409.0473
  * http://arxiv.org/abs/1412.2007
 """
-# from __future__ import absolute_import
-# from __future__ import division
+from __future__ import absolute_import
+from __future__ import division
 from __future__ import print_function
 
 import math
