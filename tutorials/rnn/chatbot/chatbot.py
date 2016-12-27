@@ -29,7 +29,7 @@ See the following papers for more information on neural translation models.
 """
 # from __future__ import absolute_import
 # from __future__ import division
-# from __future__ import print_function
+from __future__ import print_function
 
 import math
 import os
@@ -144,7 +144,7 @@ def train():
   """Train a en->fr translation model using WMT data."""
   # Prepare WMT data.
   print("Preparing WMT data in %s" % FLAGS.data_dir)
-  en_train, fr_train, en_dev, fr_dev, _, _ = data_utils.prepare_wmt_data(
+  en_train, fr_train, en_dev, fr_dev, _, _ = data_utils.prepare_gw_data(
       FLAGS.data_dir, FLAGS.en_vocab_size, FLAGS.fr_vocab_size)
 
   with tf.Session() as sess:
