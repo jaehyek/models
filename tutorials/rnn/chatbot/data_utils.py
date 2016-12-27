@@ -357,11 +357,11 @@ def prepare_gw_data(data_dir, en_vocabulary_size, fr_vocabulary_size, tokenizer=
   """
   # Get wmt data to the specified directory.
   train_path = os.path.join(data_dir, "gw_conversation")
-  dev_path = os.path.join(data_dir, "gw_conversation")
+  dev_path = os.path.join(data_dir, "gw_conversation_dev")
 
   # Create vocabularies of the appropriate sizes.
-  fr_vocab_path = os.path.join(data_dir, "gw_vocab%d.fr" % fr_vocabulary_size)
-  en_vocab_path = os.path.join(data_dir, "gw_vocab%d.en" % en_vocabulary_size)
+  fr_vocab_path = os.path.join(data_dir, "vocab%d.fr" % fr_vocabulary_size)
+  en_vocab_path = os.path.join(data_dir, "vocab%d.en" % en_vocabulary_size)
   create_vocabulary(fr_vocab_path, train_path + ".fr", fr_vocabulary_size, tokenizer)
   create_vocabulary(en_vocab_path, train_path + ".en", en_vocabulary_size, tokenizer)
 
@@ -372,10 +372,10 @@ def prepare_gw_data(data_dir, en_vocabulary_size, fr_vocabulary_size, tokenizer=
   data_to_token_ids(train_path + ".en", en_train_ids_path, en_vocab_path, tokenizer)
 
   # Create token ids for the development data.
-  fr_dev_ids_path = dev_path + ("_dev.ids%d.fr" % fr_vocabulary_size)
-  en_dev_ids_path = dev_path + ("_dev.ids%d.en" % en_vocabulary_size)
-  data_to_token_ids(dev_path + "_dev.fr", fr_dev_ids_path, fr_vocab_path, tokenizer)
-  data_to_token_ids(dev_path + "_dev.en", en_dev_ids_path, en_vocab_path, tokenizer)
+  fr_dev_ids_path = dev_path + (".ids%d.fr" % fr_vocabulary_size)
+  en_dev_ids_path = dev_path + (".ids%d.en" % en_vocabulary_size)
+  data_to_token_ids(dev_path + ".fr", fr_dev_ids_path, fr_vocab_path, tokenizer)
+  data_to_token_ids(dev_path + ".en", en_dev_ids_path, en_vocab_path, tokenizer)
 
   return (en_train_ids_path, fr_train_ids_path,
           en_dev_ids_path, fr_dev_ids_path,
