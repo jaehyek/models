@@ -75,7 +75,7 @@ def gunzip_file(gz_path, new_path):
 def get_wmt_enfr_train_set(directory):
   """Download the WMT en-fr training corpus to directory unless it's there."""
   train_path = os.path.join(directory, "giga-fren.release2.fixed")
-  if not (gfile.Exists(train_path +".fr") and gfile.Exists(train_path +".en")):
+  if not (gfile.Exists(train_path + ".fr") and gfile.Exists(train_path + ".en")):
     corpus_file = maybe_download(directory, "training-giga-fren.tar",
                                  _WMT_ENFR_TRAIN_URL)
     print("Extracting tar file %s" % corpus_file)
@@ -264,8 +264,10 @@ def prepare_wmt_data(data_dir, en_vocabulary_size, fr_vocabulary_size, tokenizer
       (6) path to the French vocabulary file.
   """
   # Get wmt data to the specified directory.
-  train_path = get_wmt_enfr_train_set(data_dir)
-  dev_path = get_wmt_enfr_dev_set(data_dir)
+  train_path = os.path.join(data_dir, "gw_conversation")
+  dev_path = os.path.join(data_dir, "gw_conversation")
+  # train_path = get_wmt_enfr_train_set(data_dir)
+  # dev_path = get_wmt_enfr_dev_set(data_dir)
 
   # Create vocabularies of the appropriate sizes.
   fr_vocab_path = os.path.join(data_dir, "vocab%d.fr" % fr_vocabulary_size)
