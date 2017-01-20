@@ -45,18 +45,19 @@ from datasets import download_and_convert_flowers
 from datasets import download_and_convert_mnist
 from datasets import download_and_convert_koreans
 from datasets import download_and_convert_apparel
+from datasets import download_and_convert_apparelv
 
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string(
-    'dataset_name',
-    None,
-    'The name of the dataset to convert, one of "cifar10", "flowers", "mnist", "koreans".')
+  'dataset_name',
+  None,
+  'The name of the dataset to convert, one of "cifar10", "flowers", "mnist", "koreans".')
 
 tf.app.flags.DEFINE_string(
-    'dataset_dir',
-    None,
-    'The directory where the output TFRecords and temporary files are saved.')
+  'dataset_dir',
+  None,
+  'The directory where the output TFRecords and temporary files are saved.')
 
 
 def main(_):
@@ -75,10 +76,12 @@ def main(_):
     download_and_convert_koreans.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparel':
     download_and_convert_apparel.run(FLAGS.dataset_dir)
+  elif FLAGS.dataset_name == 'apparelv':
+    download_and_convert_apparelv.run(FLAGS.dataset_dir)
   else:
     raise ValueError(
-        'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)
+      'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)
+
 
 if __name__ == '__main__':
   tf.app.run()
-
