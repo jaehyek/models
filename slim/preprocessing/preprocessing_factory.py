@@ -26,7 +26,7 @@ from preprocessing import lenet_preprocessing
 from preprocessing import vgg_preprocessing
 from preprocessing import koreans_preprocessing
 from preprocessing import apparel_preprocessing
-from prepocessing import nobbox_preprocessing
+from preprocessing import nobbox_preprocessing
 
 slim = tf.contrib.slim
 
