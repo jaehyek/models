@@ -26,6 +26,7 @@ from preprocessing import lenet_preprocessing
 from preprocessing import vgg_preprocessing
 from preprocessing import koreans_preprocessing
 from preprocessing import apparel_preprocessing
+from prepocessing import nobbox_preprocessing
 
 slim = tf.contrib.slim
 
@@ -63,7 +64,8 @@ def get_preprocessing(name, is_training=False):
     'vgg_16': vgg_preprocessing,
     'vgg_19': vgg_preprocessing,
     'koreans': koreans_preprocessing,
-    'apparel': apparel_preprocessing
+    'apparel': apparel_preprocessing,
+    'nobbox': nobbox_preprocessing
   }
 
   if name not in preprocessing_fn_map:
