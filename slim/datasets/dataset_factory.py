@@ -25,6 +25,7 @@ from datasets import mnist
 from datasets import koreans
 from datasets import apparel
 from datasets import apparelv
+from datasets import apparelv_dabainsang
 
 datasets_map = {
   'cifar10': cifar10,
@@ -33,7 +34,8 @@ datasets_map = {
   'mnist': mnist,
   'koreans': koreans,
   'apparel': apparel,
-  'apparelv': apparelv
+  'apparelv': apparelv,
+  'apparelv_dabainsang': apparelv_dabainsang
 }
 
 

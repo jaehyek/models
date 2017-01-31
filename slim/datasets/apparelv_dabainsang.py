@@ -31,9 +31,9 @@ slim = tf.contrib.slim
 
 _FILE_PATTERN = 'apparelv_%s_*.tfrecord'
 
-SPLITS_TO_SIZES = {'train': 57600, 'validation': 6364}
+SPLITS_TO_SIZES = {'train': 600, 'validation': 55}
 
-_NUM_CLASSES = 3
+_NUM_CLASSES = 2
 
 _ITEMS_TO_DESCRIPTIONS = {
   'image': 'A color image of apparel.',
