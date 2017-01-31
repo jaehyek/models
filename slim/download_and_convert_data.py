@@ -47,6 +47,7 @@ from datasets import download_and_convert_koreans
 from datasets import download_and_convert_apparel
 from datasets import download_and_convert_apparelv
 from datasets import download_and_convert_apparelv_dabainsang
+from datasets import download_and_convert_apparelv_dlsdl113
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -81,6 +82,8 @@ def main(_):
     download_and_convert_apparelv.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparelv_dabainsang':
     download_and_convert_apparelv_dabainsang.run(FLAGS.dataset_dir)
+  elif FLAGS.dataset_name == 'apparelv_dlsdl113':
+    download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
   else:
     raise ValueError(
       'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)
