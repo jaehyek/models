@@ -40,7 +40,7 @@ from datasets import dataset_utils
 _DATA_URL = 'http://122.38.108.102/file/data/apparel/images.tgz'
 
 # The number of images in the validation set.
-_NUM_VALIDATION = 926
+_NUM_VALIDATION = 6398
 
 # Seed for repeatability.
 _RANDOM_SEED = 0
@@ -192,7 +192,7 @@ def run(dataset_dir):
     return
 
   # dataset_utils.download_and_uncompress_tarball(_DATA_URL, dataset_dir)
-  photo_filenames, class_names = _get_filenames_and_classes(dataset_dir, 'apparelv_dabainsang')
+  photo_filenames, class_names = _get_filenames_and_classes(dataset_dir, 'apparelv_binary')
   class_names_to_ids = dict(zip(class_names, range(len(class_names))))
 
   # Divide into train and test:

@@ -27,6 +27,7 @@ from datasets import apparel
 from datasets import apparelv
 from datasets import apparelv_dabainsang
 from datasets import apparelv_dlsdl113
+from datasets import apparelv_binary
 
 datasets_map = {
   'cifar10': cifar10,
@@ -37,7 +38,8 @@ datasets_map = {
   'apparel': apparel,
   'apparelv': apparelv,
   'apparelv_dabainsang': apparelv_dabainsang,
-  'apparelv_dlsdl113': apparelv_dlsdl113
+  'apparelv_dlsdl113': apparelv_dlsdl113,
+  'apparelv_binary': apparelv_binary,
 }
 
 
