@@ -476,7 +476,7 @@ def main(_):
           logits, labels, label_smoothing=FLAGS.label_smoothing, weight=1.0)
 
       accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1)), tf.float32))
-      summaries.add(tf.scalar_summary('accuracy', accuracy))
+      tf.scalar_summary('accuracy', accuracy)
 
       return end_points
 
