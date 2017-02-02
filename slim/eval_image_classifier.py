@@ -147,6 +147,12 @@ def main(_):
     else:
       variables_to_restore = slim.get_variables_to_restore()
 
+    if logits.get_shape() != labels.get_shape():
+      labels_shape = labels.get_shape()
+      logits_shape = logits.get_shape()
+      if labels_shape[0] == logits_shape[0] and labels_shape[-1] == logits_shape[-1]:
+        logits = tf.reshape(logits, [int(labels_shape[0]), int(labels_shape[-1])])
+
     predictions = tf.argmax(logits, 1)
     labels = tf.squeeze(labels)
 
