@@ -474,7 +474,7 @@ def main(_):
             label_smoothing=FLAGS.label_smoothing, weight=0.4, scope='aux_loss')
       if logits.get_shape() != labels.get_shape():
         labels_shape = labels.get_shape()
-        logits = tf.reshape(logits, [labels_shape[0], labels_shape[-1]])
+        logits = tf.reshape(logits, [int(labels_shape[0]), int(labels_shape[-1])])
       slim.losses.softmax_cross_entropy(
           logits, labels, label_smoothing=FLAGS.label_smoothing, weight=1.0)
 
