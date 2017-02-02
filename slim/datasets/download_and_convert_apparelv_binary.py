@@ -40,7 +40,7 @@ from datasets import dataset_utils
 _DATA_URL = 'http://122.38.108.102/file/data/apparel/images.tgz'
 
 # The number of images in the validation set.
-_NUM_VALIDATION = 6398
+_NUM_VALIDATION = 6387
 
 # Seed for repeatability.
 _RANDOM_SEED = 0
