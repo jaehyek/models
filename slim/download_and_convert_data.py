@@ -49,6 +49,7 @@ from datasets import download_and_convert_apparelv
 from datasets import download_and_convert_apparelv_dabainsang
 from datasets import download_and_convert_apparelv_dlsdl113
 from datasets import download_and_convert_apparelv_binary
+from datasets import download_and_convert_apparelv_binary_without_dummy
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -61,6 +62,26 @@ tf.app.flags.DEFINE_string(
   'dataset_dir',
   None,
   'The directory where the output TFRecords and temporary files are saved.')
+
+tf.app.flags.DEFINE_boolean(
+  'custom_binary_validation',
+  False,
+  'validation data label')
+
+tf.app.flags.DEFINE_string(
+  'custom_binary_validation_label',
+  '1',
+  'validation data label')
+
+tf.app.flags.DEFINE_float(
+  'custom_binary_validation_ratio',
+  0.5,
+  'validation data ratio')
+
+tf.app.flags.DEFINE_string(
+  'output_suffix',
+  None,
+  'validation data ratio')
 
 
 def main(_):
@@ -87,6 +108,11 @@ def main(_):
     download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparelv_binary':
     download_and_convert_apparelv_binary.run(FLAGS.dataset_dir)
+  elif FLAGS.dataset_name == 'apparelv_binary_without_dummy':
+    download_and_convert_apparelv_binary_without_dummy.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
+                                                           FLAGS.custom_binary_validation_label,
+                                                           FLAGS.custom_binary_validation_ratio,
+                                                           FLAGS.output_suffix)
   else:
     raise ValueError(
       'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)

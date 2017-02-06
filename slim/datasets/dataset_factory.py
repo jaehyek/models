@@ -28,6 +28,7 @@ from datasets import apparelv
 from datasets import apparelv_dabainsang
 from datasets import apparelv_dlsdl113
 from datasets import apparelv_binary
+from datasets import apparelv_binary_without_dummy
 
 datasets_map = {
   'cifar10': cifar10,
@@ -40,10 +41,11 @@ datasets_map = {
   'apparelv_dabainsang': apparelv_dabainsang,
   'apparelv_dlsdl113': apparelv_dlsdl113,
   'apparelv_binary': apparelv_binary,
+  'apparelv_binary_without_dummy': apparelv_binary_without_dummy,
 }
 
 
-def get_dataset(name, split_name, dataset_dir, file_pattern=None, reader=None):
+def get_dataset(name, split_name, dataset_dir, file_pattern=None, reader=None, suffix=None):
   """Given a dataset name and a split_name returns a Dataset.
 
   Args:
@@ -66,4 +68,5 @@ def get_dataset(name, split_name, dataset_dir, file_pattern=None, reader=None):
     split_name,
     dataset_dir,
     file_pattern,
-    reader)
+    reader,
+    suffix=suffix)
