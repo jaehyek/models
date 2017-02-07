@@ -154,7 +154,7 @@ def main(_):
       labels_shape = labels.get_shape()
       logits_shape = logits.get_shape()
       if labels_shape[0] == logits_shape[0]:
-        logits = tf.reshape(logits, [int(labels_shape[0]), int(labels_shape[-1])])
+        logits = tf.reshape(logits, [int(labels_shape[0]), -1])
 
     predictions = tf.argmax(logits, 1)
     labels = tf.squeeze(labels)
