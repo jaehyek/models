@@ -63,7 +63,7 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None, suffix=No
 
   if suffix:
     file_pattern = 'apparelv_%s_%s_*.tfrecord'
-    file_pattern = os.path.join(dataset_dir, file_pattern % suffix, split_name)
+    file_pattern = os.path.join(dataset_dir, file_pattern % (suffix, split_name))
   else:
     if not file_pattern:
       file_pattern = _FILE_PATTERN
