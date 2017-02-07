@@ -107,7 +107,10 @@ def main(_):
   elif FLAGS.dataset_name == 'apparelv_dlsdl113':
     download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparelv_binary':
-    download_and_convert_apparelv_binary.run(FLAGS.dataset_dir)
+    download_and_convert_apparelv_binary.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
+                                             FLAGS.custom_binary_validation_label,
+                                             FLAGS.custom_binary_validation_ratio,
+                                             FLAGS.output_suffix)
   elif FLAGS.dataset_name == 'apparelv_binary_without_dummy':
     download_and_convert_apparelv_binary_without_dummy.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
                                                            FLAGS.custom_binary_validation_label,

@@ -41,7 +41,7 @@ _ITEMS_TO_DESCRIPTIONS = {
 }
 
 
-def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
+def get_split(split_name, dataset_dir, file_pattern=None, reader=None, suffix=None):
   """Gets a dataset tuple with instructions for reading Koreans.
 
   Args:
@@ -61,9 +61,13 @@ def get_split(split_name, dataset_dir, file_pattern=None, reader=None):
   if split_name not in SPLITS_TO_SIZES:
     raise ValueError('split name %s was not recognized.' % split_name)
 
-  if not file_pattern:
-    file_pattern = _FILE_PATTERN
-  file_pattern = os.path.join(dataset_dir, file_pattern % split_name)
+  if suffix:
+    file_pattern = 'apparelv_%s_%s_*.tfrecord'
+    file_pattern = os.path.join(dataset_dir, file_pattern % (suffix, split_name))
+  else:
+    if not file_pattern:
+      file_pattern = _FILE_PATTERN
+    file_pattern = os.path.join(dataset_dir, file_pattern % split_name)
 
   # Allowing None in the signature so that dataset_factory can use the default.
   if reader is None:

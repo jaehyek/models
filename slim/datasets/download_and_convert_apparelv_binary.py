@@ -98,13 +98,48 @@ def _get_filenames_and_classes(dataset_dir, dataset_name):
   return photo_filenames, sorted(class_names)
 
 
-def _get_dataset_filename(dataset_dir, split_name, shard_id):
-  output_filename = 'apparelv_%s_%05d-of-%05d.tfrecord' % (
-    split_name, shard_id, _NUM_SHARDS)
+def _get_filenames_and_classes_by_label(dataset_dir, dataset_name):
+  """Returns a list of filenames and inferred class names.
+
+  Args:
+    dataset_dir: A directory containing a set of subdirectories representing
+      class names. Each subdirectory should contain PNG or JPG encoded images.
+
+  Returns:
+    A list of image file paths, relative to `dataset_dir` and the list of
+    subdirectories, representing class names.
+  """
+  koreans_root = os.path.join(dataset_dir, dataset_name)
+  directories = []
+  class_names = []
+  for filename in os.listdir(koreans_root):
+    path = os.path.join(koreans_root, filename)
+    if os.path.isdir(path):
+      directories.append(path)
+      class_names.append(filename)
+
+  photo_filenames = {}
+  for directory in directories:
+    label_name = os.path.basename(directory)
+    photo_filenames[label_name] = []
+    for filename in os.listdir(directory):
+      path = os.path.join(directory, filename)
+      photo_filenames[label_name].append(path)
+
+  return photo_filenames, sorted(class_names)
+
+
+def _get_dataset_filename(dataset_dir, split_name, shard_id, output_suffix=None):
+  if output_suffix:
+    output_filename = 'apparelv_%s_%s_%05d-of-%05d.tfrecord' % (
+      output_suffix, split_name, shard_id, _NUM_SHARDS)
+  else:
+    output_filename = 'apparelv%s_%05d-of-%05d.tfrecord' % (
+      split_name, shard_id, _NUM_SHARDS)
   return os.path.join(dataset_dir, output_filename)
 
 
-def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir):
+def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir, output_suffix):
   """Converts the given filenames to a TFRecord dataset.
 
   Args:
@@ -125,7 +160,7 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir):
 
       for shard_id in range(_NUM_SHARDS):
         output_filename = _get_dataset_filename(
-          dataset_dir, split_name, shard_id)
+          dataset_dir, split_name, shard_id, output_suffix)
 
         with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
           start_ndx = shard_id * num_per_shard
@@ -178,7 +213,8 @@ def _dataset_exists(dataset_dir):
   return True
 
 
-def run(dataset_dir):
+def run(dataset_dir, custom_binary_validation, custom_binary_validation_label, custom_binary_validation_ratio,
+        output_suffix):
   """Runs the download and conversion operation.
 
   Args:
@@ -190,27 +226,48 @@ def run(dataset_dir):
   if _dataset_exists(dataset_dir):
     print('Dataset files already exist. Exiting without re-creating them.')
     return
-
-  # dataset_utils.download_and_uncompress_tarball(_DATA_URL, dataset_dir)
-  photo_filenames, class_names = _get_filenames_and_classes(dataset_dir, 'apparelv_binary')
-  class_names_to_ids = dict(zip(class_names, range(len(class_names))))
-
-  # Divide into train and test:
-  print("Now let's start converting the Koreans dataset!")
   random.seed(_RANDOM_SEED)
-  random.shuffle(photo_filenames)
-  training_filenames = photo_filenames[_NUM_VALIDATION:]
-  validation_filenames = photo_filenames[:_NUM_VALIDATION]
+  # dataset_utils.download_and_uncompress_tarball(_DATA_URL, dataset_dir)
+  if custom_binary_validation:
+    tmp_photo_filenames, class_names = _get_filenames_and_classes_by_label(dataset_dir, 'apparelv_binary')
+    if not custom_binary_validation_ratio:
+      custom_binary_validation_ratio = 0.
+    if custom_binary_validation_ratio > 1:
+      custom_binary_validation_ratio = 1.
+    validation_filenames = []
+    training_filenames = []
+    for key in tmp_photo_filenames:
+      if key == custom_binary_validation_label:
+        ratio = custom_binary_validation_ratio
+      else:
+        ratio = 1. - custom_binary_validation_ratio
 
+      random.shuffle(tmp_photo_filenames[key])
+      training_filenames += tmp_photo_filenames[key][int(_NUM_VALIDATION * ratio):]
+      print(key, len(tmp_photo_filenames[key][:int(_NUM_VALIDATION * ratio)]))
+      validation_filenames += tmp_photo_filenames[key][:int(_NUM_VALIDATION * ratio)]
+  else:
+    photo_filenames, class_names = _get_filenames_and_classes(dataset_dir, 'apparelv_binary')
+
+    # Divide into train and test:
+    print("Now let's start converting the Koreans dataset!")
+    random.shuffle(photo_filenames)
+    training_filenames = photo_filenames[_NUM_VALIDATION:]
+    validation_filenames = photo_filenames[:_NUM_VALIDATION]
+
+  class_names_to_ids = dict(zip(class_names, range(len(class_names))))
   # First, convert the training and validation sets.
   _convert_dataset('train', training_filenames, class_names_to_ids,
-                   dataset_dir)
+                   dataset_dir, output_suffix)
   _convert_dataset('validation', validation_filenames, class_names_to_ids,
-                   dataset_dir)
+                   dataset_dir, output_suffix)
 
   # Finally, write the labels file:
   labels_to_class_names = dict(zip(range(len(class_names)), class_names))
-  dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
+  if output_suffix:
+    dataset_utils.write_label_file(labels_to_class_names, dataset_dir, 'labels_' + output_suffix + '.txt')
+  else:
+    dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
 
   # _clean_up_temporary_files(dataset_dir, 'apparel')
   print('\nFinished converting the Koreans dataset!')

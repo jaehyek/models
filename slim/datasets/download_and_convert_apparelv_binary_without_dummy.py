@@ -256,7 +256,6 @@ def run(dataset_dir, custom_binary_validation, custom_binary_validation_label, c
     validation_filenames = photo_filenames[:_NUM_VALIDATION]
 
   class_names_to_ids = dict(zip(class_names, range(len(class_names))))
-
   # First, convert the training and validation sets.
   _convert_dataset('train', training_filenames, class_names_to_ids,
                    dataset_dir, output_suffix)
