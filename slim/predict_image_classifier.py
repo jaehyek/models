@@ -187,7 +187,7 @@ def main(_):
       checkpoint_path=checkpoint_path,
       logdir=FLAGS.eval_dir,
       num_evals=num_batches,
-      final_op=predictions,
+      final_op=[predictions, logits],
       # eval_op=names_to_updates.values(),
       variables_to_restore=variables_to_restore)
 
