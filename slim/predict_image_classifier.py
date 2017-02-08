@@ -24,6 +24,7 @@ import tensorflow as tf
 from datasets import dataset_factory
 from nets import nets_factory
 from preprocessing import preprocessing_factory
+import numpy as np
 
 slim = tf.contrib.slim
 
@@ -191,9 +192,12 @@ def main(_):
       # eval_op=names_to_updates.values(),
       variables_to_restore=variables_to_restore)
 
-    # result_predict = tf.reshape(final_op_value[0], [FLAGS.batch_size, -1])
-    # print(result_predict)
-    print(final_op_value)
+    print(final_op_value[1].shape)
+    result_predict = np.reshape(final_op_value[1], (final_op_value[1].shape[-1], FLAGS.batch_size))
+    # print(final_op_value)
+    print(result_predict)
+
+    print(np.argmax(result_predict[:, 1]))
 
 
 if __name__ == '__main__':
