@@ -197,7 +197,7 @@ def main(_):
     # print(final_op_value)
     print(result_predict)
 
-    print(np.argmax(result_predict[:, 1]))
+    print(np.argsort(result_predict[:, 1])[-5:])
 
 
 if __name__ == '__main__':
