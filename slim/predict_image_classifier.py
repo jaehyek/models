@@ -53,6 +53,9 @@ tf.app.flags.DEFINE_string(
   'dataset_name', 'imagenet', 'The name of the dataset to load.')
 
 tf.app.flags.DEFINE_string(
+  'dataset_name_suffix', None, 'The suffix of name of the dataset to load.')
+
+tf.app.flags.DEFINE_string(
   'dataset_split_name', 'test', 'The name of the train/test split.')
 
 tf.app.flags.DEFINE_string(
@@ -94,7 +97,7 @@ def main(_):
     # Select the dataset #
     ######################
     dataset = dataset_factory.get_dataset(
-      FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir)
+      FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir, suffix=FLAGS.dataset_name_suffix)
 
     ####################
     # Select the model #

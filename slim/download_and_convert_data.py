@@ -83,6 +83,11 @@ tf.app.flags.DEFINE_string(
   None,
   'validation data ratio')
 
+tf.app.flags.DEFINE_boolean(
+  'test_data',
+  False,
+  'validation data ratio')
+
 
 def main(_):
   if not FLAGS.dataset_name:
@@ -107,10 +112,13 @@ def main(_):
   elif FLAGS.dataset_name == 'apparelv_dlsdl113':
     download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparelv_binary':
-    download_and_convert_apparelv_binary.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
-                                             FLAGS.custom_binary_validation_label,
-                                             FLAGS.custom_binary_validation_ratio,
-                                             FLAGS.output_suffix)
+    if FLAGS.test_data:
+      download_and_convert_apparelv_binary.run_for_test(FLAGS.dataset_dir)
+    else:
+      download_and_convert_apparelv_binary.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
+                                               FLAGS.custom_binary_validation_label,
+                                               FLAGS.custom_binary_validation_ratio,
+                                               FLAGS.output_suffix)
   elif FLAGS.dataset_name == 'apparelv_binary_without_dummy':
     download_and_convert_apparelv_binary_without_dummy.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
                                                            FLAGS.custom_binary_validation_label,

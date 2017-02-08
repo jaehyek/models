@@ -129,6 +129,25 @@ def _get_filenames_and_classes_by_label(dataset_dir, dataset_name):
   return photo_filenames, sorted(class_names)
 
 
+def _get_filenames(dataset_dir):
+  """Returns a list of filenames and inferred class names.
+
+  Args:
+    dataset_dir: A directory containing a set of subdirectories representing
+      class names. Each subdirectory should contain PNG or JPG encoded images.
+
+  Returns:
+    A list of image file paths, relative to `dataset_dir` and the list of
+    subdirectories, representing class names.
+  """
+  photo_filenames = []
+  for filename in os.listdir(dataset_dir):
+    path = os.path.join(dataset_dir, filename)
+    photo_filenames.append(path)
+
+  return sorted(photo_filenames)
+
+
 def _get_dataset_filename(dataset_dir, split_name, shard_id, output_suffix=None):
   if output_suffix:
     output_filename = 'apparelv_%s_%s_%05d-of-%05d.tfrecord' % (
@@ -136,6 +155,11 @@ def _get_dataset_filename(dataset_dir, split_name, shard_id, output_suffix=None)
   else:
     output_filename = 'apparelv%s_%05d-of-%05d.tfrecord' % (
       split_name, shard_id, _NUM_SHARDS)
+  return os.path.join(dataset_dir, output_filename)
+
+
+def _get_dataset_filename_for_test(dataset_dir, shard_id):
+  output_filename = 'apparelv_test_%05d-of-%05d.tfrecord' % (shard_id, _NUM_SHARDS)
   return os.path.join(dataset_dir, output_filename)
 
 
@@ -189,6 +213,50 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir, out
   sys.stdout.flush()
 
 
+def _convert_dataset_for_test(filenames, dataset_dir):
+  """Converts the given filenames to a TFRecord dataset.
+
+  Args:
+    split_name: The name of the dataset, either 'train' or 'validation'.
+    filenames: A list of absolute paths to png or jpg images.
+    class_names_to_ids: A dictionary from class names (strings) to ids
+      (integers).
+    dataset_dir: The directory where the converted datasets are stored.
+  """
+  num_per_shard = int(math.ceil(len(filenames) / float(1)))
+
+  with tf.Graph().as_default():
+    image_reader = ImageReader()
+
+    with tf.Session('') as sess:
+
+      for shard_id in range(1):
+        output_filename = _get_dataset_filename_for_test(dataset_dir, shard_id)
+
+        with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
+          start_ndx = shard_id * num_per_shard
+          end_ndx = min((shard_id + 1) * num_per_shard, len(filenames))
+          for i in range(start_ndx, end_ndx):
+            sys.stdout.write('\r>> Converting image %d/%d shard %d, %s' % (
+              i + 1, len(filenames), shard_id, filenames[i]))
+            sys.stdout.flush()
+
+            # Read the filename:
+            image_data = tf.gfile.FastGFile(filenames[i], 'r').read()
+            height, width = image_reader.read_image_dims(sess, image_data)
+
+            if sys.version_info[0] == 3:
+              example = dataset_utils.image_to_tfexample_for_test(
+                image_data, 'jpg'.encode(), height, width)
+            else:
+              example = dataset_utils.image_to_tfexample_for_test(
+                image_data, 'jpg', height, width)
+            tfrecord_writer.write(example.SerializeToString())
+
+  sys.stdout.write('\n')
+  sys.stdout.flush()
+
+
 def _clean_up_temporary_files(dataset_dir, dataset_name):
   """Removes temporary files used to create the dataset.
 
@@ -213,8 +281,9 @@ def _dataset_exists(dataset_dir):
   return True
 
 
-def run(dataset_dir, custom_binary_validation, custom_binary_validation_label, custom_binary_validation_ratio,
-        output_suffix):
+def run(dataset_dir, custom_binary_validation=None, custom_binary_validation_label=None,
+        custom_binary_validation_ratio=None,
+        output_suffix=None):
   """Runs the download and conversion operation.
 
   Args:
@@ -271,3 +340,25 @@ def run(dataset_dir, custom_binary_validation, custom_binary_validation_label, c
 
   # _clean_up_temporary_files(dataset_dir, 'apparel')
   print('\nFinished converting the Koreans dataset!')
+
+
+def run_for_test(dataset_dir):
+  """Runs the download and conversion operation.
+
+  Args:
+    dataset_dir: The dataset directory where the dataset is stored.
+  """
+  if not tf.gfile.Exists(dataset_dir):
+    tf.gfile.MakeDirs(dataset_dir)
+
+  if _dataset_exists(dataset_dir):
+    print('Dataset files already exist. Exiting without re-creating them.')
+    return
+
+  photo_filenames = _get_filenames(dataset_dir)
+  # Divide into train and test:
+  print("Now let's start converting the Koreans dataset!")
+  _convert_dataset_for_test(photo_filenames, dataset_dir)
+
+  # _clean_up_temporary_files(dataset_dir, 'apparel')
+  print('\nFinished converting the test dataset!')
