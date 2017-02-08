@@ -193,7 +193,7 @@ def main(_):
       variables_to_restore=variables_to_restore)
 
     print(final_op_value[1].shape)
-    result_predict = np.reshape(final_op_value[1], (final_op_value[1].shape[-1], FLAGS.batch_size))
+    result_predict = np.reshape(final_op_value[1], (FLAGS.batch_size, final_op_value[1].shape[-1]))
     # print(final_op_value)
     print(result_predict)
 
