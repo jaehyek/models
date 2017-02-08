@@ -153,7 +153,7 @@ def main(_):
 
     # Define the metrics:
     names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
-      'Predictions': predictions,
+      # 'Predictions': predictions,
       # 'Predictions': slim.metrics.streaming_accuracy(predictions, labels),
       # 'Predictions@5': slim.metrics.streaming_recall_at_k(
       #   logits, labels, 5),
