@@ -135,6 +135,8 @@ def main(_):
       num_threads=FLAGS.num_preprocessing_threads,
       capacity=5 * FLAGS.batch_size)
 
+    tf.image_summary('test_images', images)
+
     ####################
     # Define the model #
     ####################
@@ -189,6 +191,8 @@ def main(_):
       # eval_op=names_to_updates.values(),
       variables_to_restore=variables_to_restore)
 
+    result_predict = tf.reshape(final_op_value[0], [FLAGS.batch_size, -1])
+    print(result_predict)
     print(final_op_value)
 
 
