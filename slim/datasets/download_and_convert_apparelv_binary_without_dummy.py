@@ -161,7 +161,6 @@ def _convert_dataset(split_name, filenames, class_names_to_ids, dataset_dir, out
       for shard_id in range(_NUM_SHARDS):
         output_filename = _get_dataset_filename(
           dataset_dir, split_name, shard_id, output_suffix)
-
         with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
           start_ndx = shard_id * num_per_shard
           end_ndx = min((shard_id + 1) * num_per_shard, len(filenames))

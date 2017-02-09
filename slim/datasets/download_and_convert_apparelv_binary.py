@@ -232,7 +232,6 @@ def _convert_dataset_for_test(filenames, dataset_dir):
 
       for shard_id in range(1):
         output_filename = _get_dataset_filename_for_test(dataset_dir, shard_id)
-
         with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
           start_ndx = shard_id * num_per_shard
           end_ndx = min((shard_id + 1) * num_per_shard, len(filenames))
