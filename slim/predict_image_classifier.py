@@ -196,8 +196,7 @@ def main(_):
     result_predict = np.reshape(final_op_value[1], (FLAGS.batch_size, final_op_value[1].shape[-1]))
     # print(final_op_value)
     print(result_predict)
-    result_predict = [score[1] if score[0] < score[1] else -10000 for score in result_predict]
-    print(np.argsort(np.array(result_predict)[:, 1])[-5:])
+    print(np.argsort(result_predict[:, 1])[-5:])
 
 
 if __name__ == '__main__':
