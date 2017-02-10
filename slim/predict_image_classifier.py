@@ -152,6 +152,9 @@ def main(_):
     else:
       variables_to_restore = slim.get_variables_to_restore()
 
+    if len(logits.get_shape()) == 4:
+      logits = tf.reshape(logits, [int(logits.get_shape()[0]), -1])
+
     softmax = tf.nn.softmax(logits)
     # predictions = tf.argmax(logits, 1)
 
