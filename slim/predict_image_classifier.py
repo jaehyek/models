@@ -152,7 +152,8 @@ def main(_):
     else:
       variables_to_restore = slim.get_variables_to_restore()
 
-    predictions = tf.argmax(logits, 1)
+    softmax = tf.nn.softmax(logits)
+    # predictions = tf.argmax(logits, 1)
 
     # Define the metrics:
     # names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
@@ -188,7 +189,7 @@ def main(_):
       checkpoint_path=checkpoint_path,
       logdir=FLAGS.eval_dir,
       num_evals=num_batches,
-      final_op=[predictions, logits],
+      final_op=[softmax, logits],
       # eval_op=names_to_updates.values(),
       variables_to_restore=variables_to_restore)
 
