@@ -25,7 +25,6 @@ from datasets import dataset_factory
 from nets import nets_factory
 from preprocessing import preprocessing_factory
 import numpy as np
-from inception.slim import variables
 
 slim = tf.contrib.slim
 
@@ -216,8 +215,6 @@ def main(_):
     # print(final_op_value)
     print(result_predict)
     print(np.argsort(result_predict[:, 1])[-5:])
-
-    weights = variables.variable('weights')
 
 
 if __name__ == '__main__':
