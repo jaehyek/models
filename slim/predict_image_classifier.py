@@ -136,7 +136,7 @@ def main(_):
       num_threads=FLAGS.num_preprocessing_threads,
       capacity=5 * FLAGS.batch_size)
 
-    # tf.image_summary('test_images', images, FLAGS.batch_size)
+    tf.image_summary('test_images', images, FLAGS.batch_size)
 
     ####################
     # Define the model #
@@ -145,17 +145,16 @@ def main(_):
 
     with tf.variable_scope('resnet_v2_152/block1/unit_1/bottleneck_v2/conv1', reuse=True):
       weights = tf.get_variable('weights')
-      with tf.variable_scope('visualization'):
-        # scale weights to [0 1], type is still float
-        x_min = tf.reduce_min(weights)
-        x_max = tf.reduce_max(weights)
-        kernel_0_to_1 = (weights - x_min) / (x_max - x_min)
+      # scale weights to [0 1], type is still float
+      x_min = tf.reduce_min(weights)
+      x_max = tf.reduce_max(weights)
+      kernel_0_to_1 = (weights - x_min) / (x_max - x_min)
 
-        # to tf.image_summary format [batch_size, height, width, channels]
-        kernel_transposed = tf.transpose(kernel_0_to_1, [3, 0, 1, 2])
+      # to tf.image_summary format [batch_size, height, width, channels]
+      kernel_transposed = tf.transpose(kernel_0_to_1, [3, 0, 1, 2])
 
-        # this will display random 3 filters from the 64 in conv1
-        tf.image_summary('conv1/filters', kernel_transposed, max_images=50)
+      # this will display random 3 filters from the 64 in conv1
+      tf.image_summary('conv1/filters', kernel_transposed, max_images=50)
 
     if FLAGS.moving_average_decay:
       variable_averages = tf.train.ExponentialMovingAverage(
