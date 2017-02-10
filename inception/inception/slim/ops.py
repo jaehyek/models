@@ -243,6 +243,19 @@ def conv2d(inputs,
       outputs = tf.nn.bias_add(conv, biases)
     if activation:
       outputs = activation(outputs)
+
+    with tf.variable_scope('visualization'):
+      # scale weights to [0 1], type is still float
+      x_min = tf.reduce_min(weights)
+      x_max = tf.reduce_max(weights)
+      kernel_0_to_1 = (weights - x_min) / (x_max - x_min)
+
+      # to tf.image_summary format [batch_size, height, width, channels]
+      kernel_transposed = tf.transpose(kernel_0_to_1, [3, 0, 1, 2])
+
+      # this will display random 3 filters from the 64 in conv1
+      tf.image_summary('conv1/filters', kernel_transposed, max_images=50)
+
     return outputs
 
 
