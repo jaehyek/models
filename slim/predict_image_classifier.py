@@ -25,6 +25,7 @@ from datasets import dataset_factory
 from nets import nets_factory
 from preprocessing import preprocessing_factory
 import numpy as np
+import math
 
 slim = tf.contrib.slim
 
@@ -86,7 +87,7 @@ tf.app.flags.DEFINE_integer(
 FLAGS = tf.app.flags.FLAGS
 
 
-def put_kernels_on_grid(kernel, grid_Y, grid_X, pad=1):
+def put_kernels_on_grid(kernel, pad=1):
   '''Visualize conv. features as an image (mostly for the 1st layer).
   Place kernel into a grid, with some paddings between adjacent filters.
 
@@ -99,6 +100,14 @@ def put_kernels_on_grid(kernel, grid_Y, grid_X, pad=1):
   Return:
     Tensor of shape [(Y+2*pad)*grid_Y, (X+2*pad)*grid_X, NumChannels, 1].
   '''
+
+  def factorization(n):
+    for i in range(int(math.sqrt(float(n))), 0, -1):
+      if n % i == 0:
+        if i == 1: print('Who would enter a prime number of filters')
+        return (i, int(n / i))
+
+  (grid_Y, grid_X) = factorization(kernel.get_shape()[3].value)
 
   x_min = tf.reduce_min(kernel)
   x_max = tf.reduce_max(kernel)
@@ -133,6 +142,7 @@ def put_kernels_on_grid(kernel, grid_Y, grid_X, pad=1):
 
   # scale to [0, 255] and convert to uint8
   return tf.image.convert_image_dtype(x7, dtype=tf.uint8)
+
 
 def main(_):
   if not FLAGS.dataset_dir:
@@ -193,7 +203,7 @@ def main(_):
 
     with tf.variable_scope('resnet_v2_152/block1/unit_1/bottleneck_v2/conv1', reuse=True):
       weights = tf.get_variable('weights')
-      kernel_transposed = put_kernels_on_grid(weights, 8, 8)
+      kernel_transposed = put_kernels_on_grid(weights)
       # scale weights to [0 1], type is still float
       # x_min = tf.reduce_min(weights)
       # x_max = tf.reduce_max(weights)
