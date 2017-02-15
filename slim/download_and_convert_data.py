@@ -50,6 +50,7 @@ from datasets import download_and_convert_apparelv_dabainsang
 from datasets import download_and_convert_apparelv_dlsdl113
 from datasets import download_and_convert_apparelv_binary
 from datasets import download_and_convert_apparelv_binary_without_dummy
+from datasets import download_and_convert_apparelv_dabainsang_without_dummy
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -88,6 +89,11 @@ tf.app.flags.DEFINE_boolean(
   False,
   'validation data ratio')
 
+tf.app.flags.DEFINE_boolean(
+  'is_other_dir',
+  False,
+  'validation data ratio')
+
 
 def main(_):
   if not FLAGS.dataset_name:
@@ -109,6 +115,13 @@ def main(_):
     download_and_convert_apparelv.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparelv_dabainsang':
     download_and_convert_apparelv_dabainsang.run(FLAGS.dataset_dir)
+  elif FLAGS.dataset_name == 'apparelv_dabainsang_without_dummy':
+    download_and_convert_apparelv_dabainsang_without_dummy.run(FLAGS.dataset_dir,
+                                                               FLAGS.custom_binary_validation,
+                                                               FLAGS.custom_binary_validation_label,
+                                                               FLAGS.custom_binary_validation_ratio,
+                                                               FLAGS.output_suffix,
+                                                               FLAGS.is_other_dir)
   elif FLAGS.dataset_name == 'apparelv_dlsdl113':
     download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
   elif FLAGS.dataset_name == 'apparelv_binary':
