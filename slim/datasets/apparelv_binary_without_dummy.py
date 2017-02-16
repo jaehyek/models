@@ -31,7 +31,7 @@ slim = tf.contrib.slim
 
 _FILE_PATTERN = 'apparelv_%s_*.tfrecord'
 
-SPLITS_TO_SIZES = {'train': 328700, 'validation': 30000, 'test': 100}
+SPLITS_TO_SIZES = {'train': 618528, 'validation': 8800, 'test': 100}
 
 _NUM_CLASSES = 2
 

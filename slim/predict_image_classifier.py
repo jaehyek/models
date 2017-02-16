@@ -26,6 +26,7 @@ from nets import nets_factory
 from preprocessing import preprocessing_factory
 import numpy as np
 import math
+import time
 
 slim = tf.contrib.slim
 
@@ -147,59 +148,79 @@ def put_kernels_on_grid(kernel, pad=1):
 def main(_):
   if not FLAGS.dataset_dir:
     raise ValueError('You must supply the dataset directory with --dataset_dir')
-
+  times = {}
   tf.logging.set_verbosity(tf.logging.INFO)
   with tf.Graph().as_default():
+    start = time.time()
     tf_global_step = slim.get_or_create_global_step()
+    times['global_step'] = time.time() - start
 
     ######################
     # Select the dataset #
-    ######################
+
+    start = time.time()
     dataset = dataset_factory.get_dataset(
       FLAGS.dataset_name, FLAGS.dataset_split_name, FLAGS.dataset_dir, suffix=FLAGS.dataset_name_suffix)
+    times['get_dataset'] = time.time() - start
 
     ####################
     # Select the model #
     ####################
+    start = time.time()
     network_fn = nets_factory.get_network_fn(
       FLAGS.model_name,
       num_classes=(dataset.num_classes - FLAGS.labels_offset),
       is_training=False)
+    times['select_model'] = time.time() - start
 
     ##############################################################
     # Create a dataset provider that loads data from the dataset #
     ##############################################################
+    start = time.time()
     provider = slim.dataset_data_provider.DatasetDataProvider(
       dataset,
       shuffle=False,
       common_queue_capacity=2 * FLAGS.batch_size,
       common_queue_min=FLAGS.batch_size)
+    times['get_provider'] = time.time() - start
+    start = time.time()
     [image] = provider.get(['image'])
+    times['get_image'] = time.time() - start
 
     #####################################
     # Select the preprocessing function #
     #####################################
+    start = time.time()
     preprocessing_name = FLAGS.preprocessing_name or FLAGS.model_name
     image_preprocessing_fn = preprocessing_factory.get_preprocessing(
       preprocessing_name,
       is_training=False)
+    times['get_preprocessing'] = time.time() - start
 
     eval_image_size = FLAGS.eval_image_size or network_fn.default_image_size
 
+    start = time.time()
     image = image_preprocessing_fn(image, eval_image_size, eval_image_size)
+    times['preprocessing'] = time.time() - start
 
+    start = time.time()
     images = tf.train.batch(
       [image],
       batch_size=FLAGS.batch_size,
       num_threads=FLAGS.num_preprocessing_threads,
       capacity=5 * FLAGS.batch_size)
+    times['get_batch'] = time.time() - start
 
+    start = time.time()
     tf.image_summary('test_images', images, FLAGS.batch_size)
+    times['image_summary'] = time.time() - start
 
     ####################
     # Define the model #
     ####################
+    start = time.time()
     logits, _ = network_fn(images)
+    times['do_network'] = time.time() - start
 
     # with tf.variable_scope('resnet_v2_152/block1/unit_1/bottleneck_v2/conv1', reuse=True):
     #   weights = tf.get_variable('weights')
@@ -252,13 +273,16 @@ def main(_):
       # This ensures that we make a single pass over all of the data.
       num_batches = math.ceil(dataset.num_samples / float(FLAGS.batch_size))
 
+    start = time.time()
     if tf.gfile.IsDirectory(FLAGS.checkpoint_path):
       checkpoint_path = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
     else:
       checkpoint_path = FLAGS.checkpoint_path
+    times['load_checkpoint'] = time.time() - start
 
     tf.logging.info('Evaluating %s' % checkpoint_path)
     # evaluate_loop
+    start = time.time()
     final_op_value = slim.evaluation.evaluate_once(
       master=FLAGS.master,
       checkpoint_path=checkpoint_path,
@@ -267,12 +291,14 @@ def main(_):
       final_op=[softmax, logits],
       # eval_op=names_to_updates.values(),
       variables_to_restore=variables_to_restore)
+    times['exec'] = time.time() - start
 
     print(final_op_value[1].shape)
     result_predict = np.reshape(final_op_value[1], (FLAGS.batch_size, final_op_value[1].shape[-1]))
     # print(final_op_value)
     print(result_predict)
     print(np.argsort(result_predict[:, 1])[-5:])
+  print(times)
 
 
 if __name__ == '__main__':

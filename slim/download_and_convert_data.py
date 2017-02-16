@@ -131,12 +131,14 @@ def main(_):
       download_and_convert_apparelv_binary.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
                                                FLAGS.custom_binary_validation_label,
                                                FLAGS.custom_binary_validation_ratio,
-                                               FLAGS.output_suffix)
+                                               FLAGS.output_suffix,
+                                               FLAGS.is_other_dir)
   elif FLAGS.dataset_name == 'apparelv_binary_without_dummy':
     download_and_convert_apparelv_binary_without_dummy.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
                                                            FLAGS.custom_binary_validation_label,
                                                            FLAGS.custom_binary_validation_ratio,
-                                                           FLAGS.output_suffix)
+                                                           FLAGS.output_suffix,
+                                                           FLAGS.is_other_dir)
   else:
     raise ValueError(
       'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)

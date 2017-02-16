@@ -40,7 +40,7 @@ from datasets import dataset_utils
 _DATA_URL = 'http://122.38.108.102/file/data/apparel/images.tgz'
 
 # The number of images in the validation set.
-_NUM_VALIDATION = 6387
+_NUM_VALIDATION = 8800
 
 # Seed for repeatability.
 _RANDOM_SEED = 0
@@ -153,7 +153,7 @@ def _get_dataset_filename(dataset_dir, split_name, shard_id, output_suffix=None)
     output_filename = 'apparelv_%s_%s_%05d-of-%05d.tfrecord' % (
       output_suffix, split_name, shard_id, _NUM_SHARDS)
   else:
-    output_filename = 'apparelv%s_%05d-of-%05d.tfrecord' % (
+    output_filename = 'apparelv_%s_%05d-of-%05d.tfrecord' % (
       split_name, shard_id, _NUM_SHARDS)
   return os.path.join(dataset_dir, output_filename)
 
@@ -280,14 +280,60 @@ def _dataset_exists(dataset_dir):
   return True
 
 
+def run_other_dir(dataset_dir, output_suffix):
+  """Runs the download and conversion operation.
+
+ Args:
+   dataset_dir: The dataset directory where the dataset is stored.
+ """
+
+  if not tf.gfile.Exists(dataset_dir):
+    tf.gfile.MakeDirs(dataset_dir)
+
+  if _dataset_exists(dataset_dir):
+    print('Dataset files already exist. Exiting without re-creating them.')
+    return
+
+  # dataset_utils.download_and_uncompress_tarball(_DATA_URL, dataset_dir)
+  training_filenames, class_names = _get_filenames_and_classes(dataset_dir, 'apparelv_binary\\train')
+  validation_filenames, class_names = _get_filenames_and_classes(dataset_dir,
+                                                                 'apparelv_binary\\validation')
+
+  # Divide into train and test:
+  print("Now let's start converting the Koreans dataset!")
+  random.seed(_RANDOM_SEED)
+  random.shuffle(training_filenames)
+  random.shuffle(validation_filenames)
+
+  class_names_to_ids = dict(zip(class_names, range(len(class_names))))
+  # First, convert the training and validation sets.
+  _convert_dataset('train', training_filenames, class_names_to_ids,
+                   dataset_dir, output_suffix)
+  _convert_dataset('validation', validation_filenames, class_names_to_ids,
+                   dataset_dir, output_suffix)
+
+  # Finally, write the labels file:
+  labels_to_class_names = dict(zip(range(len(class_names)), class_names))
+  if output_suffix:
+    dataset_utils.write_label_file(labels_to_class_names, dataset_dir, 'labels_' + output_suffix + '.txt')
+  else:
+    dataset_utils.write_label_file(labels_to_class_names, dataset_dir)
+
+  # _clean_up_temporary_files(dataset_dir, 'apparel')
+  print('\nFinished converting the Koreans dataset!')
+
+
 def run(dataset_dir, custom_binary_validation=None, custom_binary_validation_label=None,
         custom_binary_validation_ratio=None,
-        output_suffix=None):
+        output_suffix=None, is_other_dir=None):
   """Runs the download and conversion operation.
 
   Args:
     dataset_dir: The dataset directory where the dataset is stored.
   """
+  if is_other_dir:
+    run_other_dir(dataset_dir, output_suffix)
+
   if not tf.gfile.Exists(dataset_dir):
     tf.gfile.MakeDirs(dataset_dir)
 
