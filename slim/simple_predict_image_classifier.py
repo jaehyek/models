@@ -282,7 +282,7 @@ def main(_):
 
     tf.logging.info('Evaluating %s' % checkpoint_path)
     # evaluate_loop
-    start = time.time()
+
     from tensorflow.contrib.framework.python.ops import variables
     from tensorflow.core.protobuf import saver_pb2
     from tensorflow.python.training import saver as tf_saver
@@ -297,11 +297,14 @@ def main(_):
                                summary_writer=None,
                                global_step=None,
                                saver=None)
-    init = tf.initialize_all_variables()
-    sess = tf.Session()
-    sess.run(init)
+    # init = tf.initialize_all_variables()
+    # sess = tf.Session()
+    sess = sv.managed_session(
+      FLAGS.master, start_standard_services=False)
+    # sess.run(init)
     saver.restore(sess, checkpoint_path)
     sv.start_queue_runners(sess)
+    start = time.time()
     final_op_value = sess.run(logits)
     # final_op_value = slim.evaluation.evaluate_once(
     #   master=FLAGS.master,
