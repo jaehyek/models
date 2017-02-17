@@ -299,22 +299,21 @@ def main(_):
                                saver=None)
     # init = tf.initialize_all_variables()
     # sess = tf.Session()
-    sess = sv.managed_session(
-      FLAGS.master, start_standard_services=False)
-    # sess.run(init)
-    saver.restore(sess, checkpoint_path)
-    sv.start_queue_runners(sess)
-    start = time.time()
-    final_op_value = sess.run(logits)
-    # final_op_value = slim.evaluation.evaluate_once(
-    #   master=FLAGS.master,
-    #   checkpoint_path=checkpoint_path,
-    #   logdir=FLAGS.eval_dir,
-    #   num_evals=num_batches,
-    #   final_op=[softmax, logits],
-    #   # eval_op=names_to_updates.values(),
-    #   variables_to_restore=variables_to_restore)
-    times['exec'] = time.time() - start
+    with sv.managed_session(FLAGS.master, start_standard_services=False) as sess:
+      # sess.run(init)
+      saver.restore(sess, checkpoint_path)
+      sv.start_queue_runners(sess)
+      start = time.time()
+      final_op_value = sess.run(logits)
+      # final_op_value = slim.evaluation.evaluate_once(
+      #   master=FLAGS.master,
+      #   checkpoint_path=checkpoint_path,
+      #   logdir=FLAGS.eval_dir,
+      #   num_evals=num_batches,
+      #   final_op=[softmax, logits],
+      #   # eval_op=names_to_updates.values(),
+      #   variables_to_restore=variables_to_restore)
+      times['exec'] = time.time() - start
 
     print(final_op_value[1].shape)
     result_predict = np.reshape(final_op_value[1], (FLAGS.batch_size, final_op_value[1].shape[-1]))
