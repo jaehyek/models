@@ -222,9 +222,9 @@ def main(_):
         logits, _ = network_fn(images)
         times['do_network'] = time.time() - start
 
-        with tf.variable_scope('resnet_v2_152/block1/unit_1/bottleneck_v2/conv1', reuse=True):
+        with tf.variable_scope('resnet_v2_152/conv1/weights', reuse=True):
             # filter_summary = tf.image_summary(filter)
-            weights = tf.get_variable('weights')
+            weights = tf.get_variable('(weights)')
             #   kernel_transposed = put_kernels_on_grid(weights)
             # scale weights to [0 1], type is still float
             # x_min = tf.reduce_min(weights)
@@ -235,7 +235,7 @@ def main(_):
             # kernel_transposed = tf.transpose(kernel_0_to_1, [3, 0, 1, 2])
 
             # this will display random 3 filters from the 64 in conv1
-
+            print(weights)
             tf.summary.image('conv1/filters', weights, max_outputs=100)
 
         if FLAGS.moving_average_decay:
