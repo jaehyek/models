@@ -222,7 +222,7 @@ def main(_):
         logits, _ = network_fn(images)
         times['do_network'] = time.time() - start
 
-        # visualization conv layer1 weights
+        # visualizing first cnn weights
         # alexnet : alexnet_v2/conv1
         # resnet: resnet_v2_152/conv1
         # inception_resnet_v2: InceptionResnetV2/Conv2d_1a_3x3
