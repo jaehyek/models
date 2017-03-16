@@ -127,12 +127,12 @@ def put_kernels_on_grid(kernel, pad=1):
   # put NumKernels to the 1st dimension
   x2 = tf.transpose(x1, (3, 0, 1, 2))
   # organize grid on Y axis
-  x3 = tf.reshape(x2, tf.pack([grid_X, Y * grid_Y, X, channels]))  # 3
+  x3 = tf.reshape(x2, tf.stack([grid_X, Y * grid_Y, X, channels]))  # 3
 
   # switch X and Y axes
   x4 = tf.transpose(x3, (0, 2, 1, 3))
   # organize grid on X axis
-  x5 = tf.reshape(x4, tf.pack([1, X * grid_X, Y * grid_Y, channels]))  # 3
+  x5 = tf.reshape(x4, tf.stack([1, X * grid_X, Y * grid_Y, channels]))  # 3
 
   # back to normal order (not combining with the next step for clarity)
   x6 = tf.transpose(x5, (2, 1, 3, 0))
@@ -212,7 +212,7 @@ def main(_):
     times['get_batch'] = time.time() - start
 
     start = time.time()
-    tf.image_summary('test_images', images, FLAGS.batch_size)
+    tf.summary.image('test_images', images, FLAGS.batch_size)
     times['image_summary'] = time.time() - start
 
     ####################
@@ -222,7 +222,8 @@ def main(_):
     logits, _ = network_fn(images)
     times['do_network'] = time.time() - start
 
-    # with tf.variable_scope('resnet_v2_152/block1/unit_1/bottleneck_v2/conv1', reuse=True):
+    with tf.variable_scope('resnet_v2_152/block1/unit_1/bottleneck_v2/conv1', reuse=True):
+      # filter_summary = tf.image_summary(filter)
     #   weights = tf.get_variable('weights')
     #   kernel_transposed = put_kernels_on_grid(weights)
     # scale weights to [0 1], type is still float
@@ -234,7 +235,7 @@ def main(_):
     # kernel_transposed = tf.transpose(kernel_0_to_1, [3, 0, 1, 2])
 
     # this will display random 3 filters from the 64 in conv1
-    # tf.image_summary('conv1/filters', kernel_transposed, max_images=50)
+      tf.summary.image('conv1/filters', filter, max_outputs=100)
 
     if FLAGS.moving_average_decay:
       variable_averages = tf.train.ExponentialMovingAverage(
