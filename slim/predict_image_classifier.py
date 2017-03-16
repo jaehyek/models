@@ -222,86 +222,88 @@ def main(_):
         logits, _ = network_fn(images)
         times['do_network'] = time.time() - start
 
-        with tf.variable_scope('resnet_v2_152/conv1/weights', reuse=True):
-            # filter_summary = tf.image_summary(filter)
-            weights = tf.get_variable('(weights)')
-            #   kernel_transposed = put_kernels_on_grid(weights)
-            # scale weights to [0 1], type is still float
-            # x_min = tf.reduce_min(weights)
-            # x_max = tf.reduce_max(weights)
-            # kernel_0_to_1 = (weights - x_min) / (x_max - x_min)
-            #
-            # # to tf.image_summary format [batch_size, height, width, channels]
-            # kernel_transposed = tf.transpose(kernel_0_to_1, [3, 0, 1, 2])
+        # visualization conv layer1 weights
+        # alexnet : alexnet_v2/conv1
+        # resnet: resnet_v2_152/conv1
+        # inception_resnet_v2: InceptionResnetV2/Conv2d_1a_3x3
+        with tf.variable_scope('resnet_v2_152/conv1', reuse=True):
+            # get first weights
+            weights = tf.get_variable('weights')
 
-            # this will display random 3 filters from the 64 in conv1
-            print(weights)
-            tf.summary.image('conv1/filters', weights, max_outputs=100)
+            # change weights values to image color
+            x_min = tf.reduce_min(weights)
+            x_max = tf.reduce_max(weights)
+            weights_0_to_1 = (weights - x_min) / (x_max - x_min)
+            weights_0_to_255_uint8 = tf.image.convert_image_dtype(weights_0_to_1, dtype=tf.uint8)
 
-        if FLAGS.moving_average_decay:
-            variable_averages = tf.train.ExponentialMovingAverage(
-                FLAGS.moving_average_decay, tf_global_step)
-            variables_to_restore = variable_averages.variables_to_restore(
-                slim.get_model_variables())
-            variables_to_restore[tf_global_step.op.name] = tf_global_step
-        else:
-            variables_to_restore = slim.get_variables_to_restore()
+            weights_transposed = tf.transpose(weights_0_to_255_uint8, [3, 0, 1, 2])
 
-        if len(logits.get_shape()) == 4:
-            logits = tf.reshape(logits, [int(logits.get_shape()[0]), -1])
+            tf.summary.image('conv1/filters', weights_transposed, max_outputs=100)
 
-        softmax = tf.nn.softmax(logits)
-        # predictions = tf.argmax(logits, 1)
+    if FLAGS.moving_average_decay:
+        variable_averages = tf.train.ExponentialMovingAverage(
+            FLAGS.moving_average_decay, tf_global_step)
+        variables_to_restore = variable_averages.variables_to_restore(
+            slim.get_model_variables())
+        variables_to_restore[tf_global_step.op.name] = tf_global_step
+    else:
+        variables_to_restore = slim.get_variables_to_restore()
 
-        # Define the metrics:
-        # names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
-        # 'Predictions': predictions,
-        # 'Predictions': slim.metrics.streaming_accuracy(predictions, labels),
-        # 'Predictions@5': slim.metrics.streaming_recall_at_k(
-        #   logits, labels, 5),
-        # })
+    if len(logits.get_shape()) == 4:
+        logits = tf.reshape(logits, [int(logits.get_shape()[0]), -1])
 
-        # Print the summaries to screen.
-        # for name, value in names_to_values.iteritems():
-        #   summary_name = 'eval/%s' % name
-        #   op = tf.scalar_summary(summary_name, value, collections=[])
-        #   op = tf.Print(op, [value], summary_name)
-        #   tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
+    softmax = tf.nn.softmax(logits)  # predictions = tf.argmax(logits, 1)
 
-        # TODO(sguada) use num_epochs=1
-        if FLAGS.max_num_batches:
-            num_batches = FLAGS.max_num_batches
-        else:
-            # This ensures that we make a single pass over all of the data.
-            num_batches = math.ceil(dataset.num_samples / float(FLAGS.batch_size))
+    # Define the metrics:
+    # names_to_values, names_to_updates = slim.metrics.aggregate_metric_map({
+    # 'Predictions': predictions,
+    # 'Predictions': slim.metrics.streaming_accuracy(predictions, labels),
+    # 'Predictions@5': slim.metrics.streaming_recall_at_k(
+    #   logits, labels, 5),
+    # })
 
-        start = time.time()
-        if tf.gfile.IsDirectory(FLAGS.checkpoint_path):
-            checkpoint_path = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
-        else:
-            checkpoint_path = FLAGS.checkpoint_path
-        times['load_checkpoint'] = time.time() - start
+    # Print the summaries to screen.
+    # for name, value in names_to_values.iteritems():
+    #   summary_name = 'eval/%s' % name
+    #   op = tf.scalar_summary(summary_name, value, collections=[])
+    #   op = tf.Print(op, [value], summary_name)
+    #   tf.add_to_collection(tf.GraphKeys.SUMMARIES, op)
 
-        tf.logging.info('Evaluating %s' % checkpoint_path)
-        # evaluate_loop
-        start = time.time()
-        final_op_value = slim.evaluation.evaluate_once(
-            master=FLAGS.master,
-            checkpoint_path=checkpoint_path,
-            logdir=FLAGS.eval_dir,
-            num_evals=num_batches,
-            final_op=[softmax, logits],
-            # eval_op=names_to_updates.values(),
-            variables_to_restore=variables_to_restore)
-        times['exec'] = time.time() - start
+    # TODO(sguada) use num_epochs=1
+    if FLAGS.max_num_batches:
+        num_batches = FLAGS.max_num_batches
+    else:
+        # This ensures that we make a single pass over all of the data.
+        num_batches = math.ceil(dataset.num_samples / float(FLAGS.batch_size))
 
-        print(final_op_value[1].shape)
-        result_predict = np.reshape(final_op_value[1], (FLAGS.batch_size, final_op_value[1].shape[-1]))
-        # print(final_op_value)
-        print(result_predict)
-        print(np.argsort(result_predict[:, 1])[-5:])
-    print(times)
+    start = time.time()
+    if tf.gfile.IsDirectory(FLAGS.checkpoint_path):
+        checkpoint_path = tf.train.latest_checkpoint(FLAGS.checkpoint_path)
+    else:
+        checkpoint_path = FLAGS.checkpoint_path
+    times['load_checkpoint'] = time.time() - start
 
+    tf.logging.info('Evaluating %s' % checkpoint_path)
+    # evaluate_loop
+    start = time.time()
+    final_op_value = slim.evaluation.evaluate_once(
+        master=FLAGS.master,
+        checkpoint_path=checkpoint_path,
+        logdir=FLAGS.eval_dir,
+        num_evals=num_batches,
+        final_op=[softmax, logits],
+        # eval_op=names_to_updates.values(),
+        variables_to_restore=variables_to_restore)
+    times['exec'] = time.time() - start
+
+    print(final_op_value[1].shape)
+    result_predict = np.reshape(final_op_value[1], (FLAGS.batch_size, final_op_value[1].shape[-1]))
+    # print(final_op_value)
+    print(result_predict)
+    print(np.argsort(result_predict[:, 1])[-5:])
+
+
+print(times)
 
 if __name__ == '__main__':
     tf.app.run()
