@@ -18,37 +18,39 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from datasets import cifar10
-from datasets import flowers
-from datasets import imagenet
-from datasets import mnist
-from datasets import koreans
-from datasets import apparel
-from datasets import apparelv
-from datasets import apparelv_dabainsang
-from datasets import apparelv_dabainsang_without_dummy
-from datasets import apparelv_dlsdl113
-from datasets import apparelv_binary
-from datasets import apparelv_binary_without_dummy
+from slim.datasets import cifar10
+from slim.datasets import flowers
+from slim.datasets import imagenet
+from slim.datasets import mnist
+from slim.datasets import koreans
+from slim.datasets import apparel
+from slim.datasets import apparelv
+from slim.datasets import apparelv_dabainsang
+from slim.datasets import apparelv_dabainsang_without_dummy
+from slim.datasets import apparelv_dlsdl113
+from slim.datasets import apparelv_binary
+from slim.datasets import apparelv_binary_without_dummy
+from slim.datasets import common
 
 datasets_map = {
-  'cifar10': cifar10,
-  'flowers': flowers,
-  'imagenet': imagenet,
-  'mnist': mnist,
-  'koreans': koreans,
-  'apparel': apparel,
-  'apparelv': apparelv,
-  'apparelv_dabainsang': apparelv_dabainsang,
-  'apparelv_dabainsang_without_dummy': apparelv_dabainsang_without_dummy,
-  'apparelv_dlsdl113': apparelv_dlsdl113,
-  'apparelv_binary': apparelv_binary,
-  'apparelv_binary_without_dummy': apparelv_binary_without_dummy,
+    'cifar10': cifar10,
+    'flowers': flowers,
+    'imagenet': imagenet,
+    'mnist': mnist,
+    'koreans': koreans,
+    'apparel': apparel,
+    'apparelv': apparelv,
+    'apparelv_dabainsang': apparelv_dabainsang,
+    'apparelv_dabainsang_without_dummy': apparelv_dabainsang_without_dummy,
+    'apparelv_dlsdl113': apparelv_dlsdl113,
+    'apparelv_binary': apparelv_binary,
+    'apparelv_binary_without_dummy': apparelv_binary_without_dummy,
+    'common': common,
 }
 
 
 def get_dataset(name, split_name, dataset_dir, file_pattern=None, reader=None, suffix=None):
-  """Given a dataset name and a split_name returns a Dataset.
+    """Given a dataset name and a split_name returns a Dataset.
 
   Args:
     name: String, the name of the dataset.
@@ -64,18 +66,18 @@ def get_dataset(name, split_name, dataset_dir, file_pattern=None, reader=None, s
   Raises:
     ValueError: If the dataset `name` is unknown.
   """
-  if name not in datasets_map:
-    raise ValueError('Name of dataset unknown %s' % name)
-  if suffix:
-    return datasets_map[name].get_split(
-      split_name,
-      dataset_dir,
-      file_pattern,
-      reader,
-      suffix=suffix)
-  else:
-    return datasets_map[name].get_split(
-      split_name,
-      dataset_dir,
-      file_pattern,
-      reader)
+    if name not in datasets_map:
+        raise ValueError('Name of dataset unknown %s' % name)
+    if suffix:
+        return datasets_map[name].get_split(
+            split_name,
+            dataset_dir,
+            file_pattern,
+            reader,
+            suffix=suffix)
+    else:
+        return datasets_map[name].get_split(
+            split_name,
+            dataset_dir,
+            file_pattern,
+            reader)

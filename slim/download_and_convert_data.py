@@ -40,109 +40,124 @@ from __future__ import print_function
 
 import tensorflow as tf
 
-from datasets import download_and_convert_cifar10
-from datasets import download_and_convert_flowers
-from datasets import download_and_convert_mnist
-from datasets import download_and_convert_koreans
-from datasets import download_and_convert_apparel
-from datasets import download_and_convert_apparelv
-from datasets import download_and_convert_apparelv_dabainsang
-from datasets import download_and_convert_apparelv_dlsdl113
-from datasets import download_and_convert_apparelv_binary
-from datasets import download_and_convert_apparelv_binary_without_dummy
-from datasets import download_and_convert_apparelv_dabainsang_without_dummy
+from slim.datasets import download_and_convert_cifar10
+from slim.datasets import download_and_convert_flowers
+from slim.datasets import download_and_convert_mnist
+from slim.datasets import download_and_convert_koreans
+from slim.datasets import download_and_convert_apparel
+from slim.datasets import download_and_convert_apparelv
+from slim.datasets import download_and_convert_apparelv_dabainsang
+from slim.datasets import download_and_convert_apparelv_dlsdl113
+from slim.datasets import download_and_convert_apparelv_binary
+from slim.datasets import download_and_convert_apparelv_binary_without_dummy
+from slim.datasets import download_and_convert_apparelv_dabainsang_without_dummy
+from slim.datasets import download_and_convert_common
 
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string(
-  'dataset_name',
-  None,
-  'The name of the dataset to convert, one of "cifar10", "flowers", "mnist", "koreans".')
+    'dataset_name',
+    None,
+    'The name of the dataset to convert, one of "cifar10", "flowers", "mnist", "koreans".')
 
 tf.app.flags.DEFINE_string(
-  'dataset_dir',
-  None,
-  'The directory where the output TFRecords and temporary files are saved.')
+    'dataset_dir',
+    None,
+    'The directory where the output TFRecords and temporary files are saved.')
 
 tf.app.flags.DEFINE_boolean(
-  'custom_binary_validation',
-  False,
-  'validation data label')
+    'custom_binary_validation',
+    False,
+    'validation data label')
 
 tf.app.flags.DEFINE_string(
-  'custom_binary_validation_label',
-  '1',
-  'validation data label')
+    'custom_binary_validation_label',
+    '1',
+    'validation data label')
 
 tf.app.flags.DEFINE_float(
-  'custom_binary_validation_ratio',
-  0.5,
-  'validation data ratio')
+    'custom_binary_validation_ratio',
+    0.5,
+    'validation data ratio')
 
 tf.app.flags.DEFINE_string(
-  'output_suffix',
-  None,
-  'validation data ratio')
+    'output_suffix',
+    None,
+    'validation data ratio')
 
 tf.app.flags.DEFINE_boolean(
-  'test_data',
-  False,
-  'validation data ratio')
+    'test_data',
+    False,
+    'validation data ratio')
 
 tf.app.flags.DEFINE_boolean(
-  'is_other_dir',
-  False,
-  'validation data ratio')
+    'is_other_dir',
+    False,
+    'validation data ratio')
+
+tf.app.flags.DEFINE_integer(
+    'num_validation',
+    False,
+    'validation file number')
 
 
 def main(_):
-  if not FLAGS.dataset_name:
-    raise ValueError('You must supply the dataset name with --dataset_name')
-  if not FLAGS.dataset_dir:
-    raise ValueError('You must supply the dataset directory with --dataset_dir')
+    if not FLAGS.dataset_name:
+        raise ValueError('You must supply the dataset name with --dataset_name')
+    if not FLAGS.dataset_dir:
+        raise ValueError('You must supply the dataset directory with --dataset_dir')
 
-  if FLAGS.dataset_name == 'cifar10':
-    download_and_convert_cifar10.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'flowers':
-    download_and_convert_flowers.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'mnist':
-    download_and_convert_mnist.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'koreans':
-    download_and_convert_koreans.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'apparel':
-    download_and_convert_apparel.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'apparelv':
-    download_and_convert_apparelv.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'apparelv_dabainsang':
-    download_and_convert_apparelv_dabainsang.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'apparelv_dabainsang_without_dummy':
-    download_and_convert_apparelv_dabainsang_without_dummy.run(FLAGS.dataset_dir,
-                                                               FLAGS.custom_binary_validation,
+    if FLAGS.dataset_name == 'cifar10':
+        download_and_convert_cifar10.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'flowers':
+        download_and_convert_flowers.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'mnist':
+        download_and_convert_mnist.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'koreans':
+        download_and_convert_koreans.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'apparel':
+        download_and_convert_apparel.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'apparelv':
+        download_and_convert_apparelv.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'apparelv_dabainsang':
+        download_and_convert_apparelv_dabainsang.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'apparelv_dabainsang_without_dummy':
+        download_and_convert_apparelv_dabainsang_without_dummy.run(FLAGS.dataset_dir,
+                                                                   FLAGS.custom_binary_validation,
+                                                                   FLAGS.custom_binary_validation_label,
+                                                                   FLAGS.custom_binary_validation_ratio,
+                                                                   FLAGS.output_suffix,
+                                                                   FLAGS.is_other_dir)
+    elif FLAGS.dataset_name == 'apparelv_dlsdl113':
+        download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'apparelv_binary':
+        if FLAGS.test_data:
+            download_and_convert_apparelv_binary.run_for_test(FLAGS.dataset_dir)
+        else:
+            download_and_convert_apparelv_binary.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
+                                                     FLAGS.custom_binary_validation_label,
+                                                     FLAGS.custom_binary_validation_ratio,
+                                                     FLAGS.output_suffix,
+                                                     FLAGS.is_other_dir)
+    elif FLAGS.dataset_name == 'apparelv_binary_without_dummy':
+        download_and_convert_apparelv_binary_without_dummy.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
                                                                FLAGS.custom_binary_validation_label,
                                                                FLAGS.custom_binary_validation_ratio,
                                                                FLAGS.output_suffix,
                                                                FLAGS.is_other_dir)
-  elif FLAGS.dataset_name == 'apparelv_dlsdl113':
-    download_and_convert_apparelv_dlsdl113.run(FLAGS.dataset_dir)
-  elif FLAGS.dataset_name == 'apparelv_binary':
-    if FLAGS.test_data:
-      download_and_convert_apparelv_binary.run_for_test(FLAGS.dataset_dir)
+    elif FLAGS.dataset_name == 'common':
+        if FLAGS.test_data:
+            download_and_convert_common.run_for_test(FLAGS.dataset_dir)
+        else:
+            download_and_convert_common.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
+                                            FLAGS.custom_binary_validation_label,
+                                            FLAGS.custom_binary_validation_ratio,
+                                            FLAGS.output_suffix,
+                                            FLAGS.is_other_dir)
     else:
-      download_and_convert_apparelv_binary.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
-                                               FLAGS.custom_binary_validation_label,
-                                               FLAGS.custom_binary_validation_ratio,
-                                               FLAGS.output_suffix,
-                                               FLAGS.is_other_dir)
-  elif FLAGS.dataset_name == 'apparelv_binary_without_dummy':
-    download_and_convert_apparelv_binary_without_dummy.run(FLAGS.dataset_dir, FLAGS.custom_binary_validation,
-                                                           FLAGS.custom_binary_validation_label,
-                                                           FLAGS.custom_binary_validation_ratio,
-                                                           FLAGS.output_suffix,
-                                                           FLAGS.is_other_dir)
-  else:
-    raise ValueError(
-      'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)
+        raise ValueError(
+            'dataset_name [%s] was not recognized.' % FLAGS.dataset_dir)
 
 
 if __name__ == '__main__':
-  tf.app.run()
+    tf.app.run()
